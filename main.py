@@ -26,7 +26,7 @@ claw = Motor(Port.A)
 
 
 ########################Calibration######################
-def calibrate(start_position):
+def calibrate(start_position, start_height):
     elbow.run_until_stalled(60,then=Stop.HOLD, duty_limit=50)
     elbow.reset_angle(120)
     
@@ -38,6 +38,9 @@ def calibrate(start_position):
         axis.run_until_stalled(60,then=Stop.HOLD, duty_limit=30)
     axis.reset_angle(0)
     axis.run_target(60, start_position)
+    
+    elbow.run_target(60, start_height)
+    elbow.hold()
 #########################################################
 
 ######################RGB Sensor#########################
@@ -88,7 +91,7 @@ def grab():
 #########################################################
 
 ######################Restart############################
-def restart(start_position):
+def restart(start_position, height_position):
     elbow.run_target(60, 0)
 
     claw.run_until_stalled(200,then=Stop.COAST, duty_limit=50)
@@ -102,7 +105,7 @@ def restart(start_position):
     axis.reset_angle(0)
     axis.run_target(60,start_position)
 
-    elbow.run_target(60, 0)
+    elbow.run_target(60, height_position)
 #########################################################
 
 
@@ -141,6 +144,21 @@ def menu_color(speach):
         color = "all"
     return color
 
+  def menu_height(speach):
+    ev3.speaker.say(speach)
+    button=[]
+    while button == []:
+        button = ev3.buttons.pressed()
+    if Button.UP in button:
+        position = 120
+    elif Button.LEFT in button:
+        position = None
+    elif Button.DOWN in button:
+        position = 0
+    elif Button.RIGHT in button:
+        position = 35
+    return position
+
 def menu_main(speach):
     ev3.speaker.say(speach)
     ev3.screen.clear()
@@ -158,13 +176,24 @@ def menu_main(speach):
 
 ###################Input####################
 def parameters():
-    ev3.screen.load_image("pybrick1.png")  
+    ev3.screen.load_image("pybrick1.png")
     start_position = menu_position("Chose The pick up position")
     ev3.screen.clear()
+
+    ev3.screen.load_image("pybrick5.png")
+    height_position_p = menu_height("Chose the height for the pick up position")
+    ev3.screen.clear()
+
     ev3.screen.load_image("pybrick2.png")
     end_position = menu_position("Chose the drop off position")
     color = menu_color("Chose the color for the drop off zone")
+    ev3.screen.clear()
+
+    ev3.screen.load_image("pybrick6.png")
+    height_position_d = menu_height("Chose the height for the drop off position")
+
     d={color:end_position}
+    d2={color:height_position_d}#watch
     taken_zones=1
     switch = True
     while taken_zones < 3 and switch:
@@ -174,10 +203,44 @@ def parameters():
             ev3.screen.load_image("pybrick2.png")
             position_in_d = menu_position("Chose the drop off position")
             color_in_d = menu_color("Chose the color for the drop off zone")
+            
+            ev3.screen.clear()
+            ev3.screen.load_image("pybrick6.png")
+            height_position_d_ind = menu_height("Chose the height for the drop off position")
+
             d[color_in_d] = position_in_d
+            d2[color_in_d] = height_position_d_ind
             taken_zones +=1
         elif answer == "no":
             switch = False
-    return start_position,d
+    return start_position,height_position_p,d,d2
+############################################
 
+
+##################Main######################
+def main():
+    start_position, start_height, d, d2 = parameters()
+    ev3.screen.clear()
+    calibrate(start_position,start_height)
+
+    run=True
+    while run:
+        grab()
+        color_brick=rgb_sensor()
+
+        if color_brick not in d.keys():
+            ev3.speaker.say("I dont have a drop off zone for that color")
+        elif "all" in d.keys():
+            all_colors_p = d.get("all")
+            axis.run_target(60,all_colors_p)
+
+        try:
+           end_position = d.get(color_brick)
+           end_height = d2.get(color_brick)
+           axis.run_target(60,end_position)
+           elbow.run_target(60, end_height)
+        except:
+            pass
+        restart(start_position,start_height)
+main()
 ############################################
