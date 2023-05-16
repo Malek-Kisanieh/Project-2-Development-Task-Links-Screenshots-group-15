@@ -240,6 +240,6 @@ def main():
            elbow.run_target(60, end_height)
         except:
             pass
-        restart(start_position,start_height)
+        restart(start_position,start_height)   
 main()
 ############################################
