@@ -143,7 +143,7 @@ def menu_color(speach):
         color = "all"
     return color
 
-  def menu_height(speach):
+def menu_height(speach):
     ev3.speaker.say(speach)
     button=[]
     while button == []:
