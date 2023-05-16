@@ -5,6 +5,7 @@ In this project we are using robots to sort items at different positions after i
 
 ##Geting Started
 
+
 -To start yo need to have VisualStudio with python
 -Download the VSCode extension EV3 MicroPython https://marketplace.visualstudio.com/items?itemName=lego-education.ev3-micropython
 -When usig the extention it will create a folder where you can paste the python code.
