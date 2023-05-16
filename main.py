@@ -91,8 +91,7 @@ def grab():
 #########################################################
 
 ######################Restart############################
-def restart(start_position, height_position):
-    elbow.run_target(60, 0)
+def restart(start_position, start_height):
 
     claw.run_until_stalled(200,then=Stop.COAST, duty_limit=50)
     claw.reset_angle(0)
@@ -105,7 +104,7 @@ def restart(start_position, height_position):
     axis.reset_angle(0)
     axis.run_target(60,start_position)
 
-    elbow.run_target(60, height_position)
+    elbow.run_target(60, start_height)
 #########################################################
 
 
