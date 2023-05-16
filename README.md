@@ -15,7 +15,9 @@ In this project we are using robots to sort items at different positions after i
 ##Building and running
 
 -When the program is running it will request for a set of inputs, made by buttons.
+
 -The screen will show a request alogside the options to chose between, like a menu.
+
 -The robot do not take any manual input.
 
 ##Features
